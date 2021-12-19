@@ -3,12 +3,12 @@
 
 name: node_build_dev_to_16..15
 
-on: workflow_dispatch
+# on: workflow_dispatch
 
-# on:
-#   push:
-#     tags:
-#       - 'v*.*.*'
+on:
+  push:
+    tags:
+      - 'v*.*.*'
 
 env:
   DOCKER_ACCESS_TOKEN: ${{ secrets.DOCKER_ACCESS_TOKEN }}

@@ -1,6 +1,7 @@
 ## Unreleased (2021-12-19)
 
 ### Bugs fixed:
+123
 
 - fix something([`fc30517`](https://github.com/ginlink/test-github-action/commit/fc30517fe64386d8e032323c334f6bf2174bd9f3)) (@蒋金)
 

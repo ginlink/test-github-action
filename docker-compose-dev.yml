@@ -1,0 +1,21 @@
+version: '3'
+
+services:
+  web:
+    image: coinflow/convert-dashboard-web:dev
+    container_name: web
+    restart: always
+    ports:
+      - '9990:80'
+    privileged: true
+  api:
+    image: ginlink/test-rollback:dev
+    container_name: api
+    restart: always
+    ports:
+      - '9010:9991'
+    privileged: true
+
+networks:
+  lend_default:
+    driver: bridge

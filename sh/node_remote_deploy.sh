@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/root/.nvm/versions/node/v14.18.2/bin/node
 
 const child_process = require('child_process');
 const fs = require('fs');

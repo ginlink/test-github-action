@@ -1,0 +1,10 @@
+version: '3'
+
+services:
+  web:
+    image: example/example-image:tag
+    container_name: web
+    restart: always
+    ports:
+      - '9990:80'
+    privileged: true

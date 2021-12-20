@@ -2,7 +2,7 @@ version: '3'
 
 services:
   web:
-    image: example/example-image:tag
+    image: coinflow/convert-dashboard-web:dev
     container_name: web
     restart: always
     ports:

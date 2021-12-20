@@ -8,7 +8,7 @@ mkdir -p ~/.ssh
 chmod 0600 deploy.key
 ssh-add deploy.key
 
-# echo "Host *\n\tStrictHostKeyChecking no\n\n" >> ~/.ssh/config
+echo "Host *\n\tStrictHostKeyChecking no\n\n" >> ~/.ssh/config
 
 echo "add private key success"
 

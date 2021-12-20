@@ -123,13 +123,13 @@ async function main() {
   if (!currentTag) return console.log('[main](no tag):',)
 
   try {
-    await actionMkdir(__dirname, ['version', 'docker'])
+    // await actionMkdir(__dirname, ['version', 'docker'])
 
     // await actionLoginSSH()
 
-    await actionScpRemoteFile()
+    // await actionScpRemoteFile()
     await actionUpdateVersion(currentTag)
-    await actionScp2Remote()
+    // await actionScp2Remote()
   } catch (err) {
     console.log('[](err):', err)
   }

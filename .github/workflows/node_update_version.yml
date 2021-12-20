@@ -36,5 +36,7 @@ jobs:
             */*/node_modules
           key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
       - name: run script
-        run: ./sh/login_ssh.sh
-        # run: ./sh/node_update_version_to_16..15.sh
+        run: ./sh/node_update_version1.sh
+        # run: ./sh/copy2local.sh && |
+        #   ./sh/node_update_version.sh && |
+        #   ./sh/copy2remote.sh

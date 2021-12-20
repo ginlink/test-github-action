@@ -43,4 +43,4 @@ jobs:
       - name: build dev
         run: ./sh/build_dev_to_16..15.sh
       - name: update version
-        run: ./sh/node_update_version_to_16..15.sh
+        run: ./sh/update_version.sh

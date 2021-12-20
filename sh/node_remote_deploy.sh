@@ -141,7 +141,7 @@ function getLatestVersion() {
       }
 
       const arrLines = data.split('\n');
-      const version = arrLines[arrLines.length - 1]
+      const version = arrLines[arrLines.length - 2]
       console.log('[](read-version):', version, arrLines)
 
       resolve(version ? version : undefined);

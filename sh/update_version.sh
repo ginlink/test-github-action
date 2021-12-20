@@ -15,6 +15,6 @@ echo "11111111111111111111111"
 
 scp $REMOTE_NAME@$REMOTE_HOST:~/sh/version/version_history.txt ./version_history.txt
 
-echo '1.0.1' >> ./version_history.txt
+echo $RELEASE_VERSION >> ./version_history.txt
 
 scp ./version_history.txt $REMOTE_NAME@$REMOTE_HOST:~/sh/version/version_history.txt

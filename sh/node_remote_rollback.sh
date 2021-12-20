@@ -7,7 +7,7 @@ const path = require('path');
 console.log('node_remote_deploy, i am running');
 
 const VERSION_NAME = 'version_history.txt';
-const versionFilepath = path.join(__dirname, VERSION_NAME);
+const versionFilepath = path.join(__dirname, 'version', VERSION_NAME);
 const dockerComposeFilepath = path.join(
   __dirname,
   '..',
@@ -105,11 +105,12 @@ function removeLastLineData(filepath) {
         }
       }
 
-      const newData = arrLines.length ? arrLines.join('\n') : '';
+      let newData = arrLines.length ? arrLines.join('\n') : '';
+      newData += '\n' //last line append a \n
 
       fs.writeFileSync(filepath, newData);
 
-      const lastVersion = arrLines[arrLines.length - 1];
+      const lastVersion = arrLines[arrLines.length - 2];
 
       // full success
       resolve({
@@ -134,7 +135,7 @@ function getLatestVersion() {
 
       const arrLines = data.split('\n');
 
-      resolve(arrLines[arrLines.length - 1]);
+      resolve(arrLines[arrLines.length - 2]);
     } catch (err) {
       reject(err);
     }
@@ -175,19 +176,23 @@ async function actionDockerCompose(tag) {
 }
 
 async function main() {
-  try {
-    const latestTag = await getLatestVersion();
-    const { success, data: tag } = await removeLastLineData(versionFilepath);
+  const latestTag = await getLatestVersion();
 
-    if (!success || !tag) {
-      throw new Error('[removeLastLineData](err):', 'version数据异常');
-    }
-
-    await actionStopCurrent(latestTag);
-    await actionDockerCompose(tag);
-  } catch (err) {
-    console.log('[node_remote_deploy](err):', err);
+  if (!validVersion(latestTag)) {
+    throw new Error('[removeLastLineData](err):', 'version数据异常');
   }
+
+  const { success, data: tag } = await removeLastLineData(versionFilepath);
+
+  if (!success || !tag) {
+    throw new Error('[removeLastLineData](err):', 'version数据异常');
+  }
+
+
+  console.log('[]:', success, latestTag, tag)
+  process.exit(0)
+  await actionStopCurrent(latestTag);
+  await actionDockerCompose(tag);
 }
 
 main();

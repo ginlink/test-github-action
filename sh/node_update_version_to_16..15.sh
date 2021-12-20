@@ -8,11 +8,13 @@ console.log('hello, i am running!')
 // console.log(`the env is ${process.env}`)
 console.log(`the tag version is ${process.env.RELEASE_VERSION}`)
 
+// const currentTag = env.RELEASE_VERSION
+const currentTag = '1.0.17'
 const REMOTE_HOST = env.ADMIN_HOST_15
 const REMOTE_NAME = env.HOST_NAME_15
 const VERSION_NAME = 'version_history.txt'
 const loginFilepath = path.join(__dirname, 'login_ssh.sh')
-const versionFilepath = path.join(__dirname, VERSION_NAME)
+const versionFilepath = path.join(__dirname, 'version', VERSION_NAME)
 const versionFilepathRemote = `~/sh/version/${VERSION_NAME}`
 
 function exec(command) {
@@ -92,25 +94,27 @@ async function actionScpRemoteFile() {
   }
 }
 
-async function actionUpdateVersion() {
-  await addLastLine('1.0.0', versionFilepath)
-  console.log('[](update success):',)
+async function actionUpdateVersion(tag) {
+  await addLastLine(tag, versionFilepath)
+
+  console.log('[success](update-version):', tag)
 }
 
 async function actionScp2Remote() {
   try {
-    const { stdout } = await exec(`scp ${versionFilepath} ${REMOTE_NAME}@${REMOTE_HOST}:${versionFilepathRemote}`)
-    console.log('[actionScp2Remote](stdout):', stdout)
+    await exec(`scp ${versionFilepath} ${REMOTE_NAME}@${REMOTE_HOST}:${versionFilepathRemote}`)
   } catch (err) {
     console.log('[actionScp2Remote](err):', err.error)
   }
 }
 
 async function main() {
+  if (!currentTag) return console.log('[main](no tag):',)
+
   try {
     await actionLoginSSH()
     await actionScpRemoteFile()
-    await actionUpdateVersion()
+    await actionUpdateVersion(currentTag)
     await actionScp2Remote()
   } catch (err) {
     console.log('[](err):', err)

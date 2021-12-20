@@ -3,7 +3,7 @@ version: '3'
 services:
   web:
     image: example/example-image:tag
-    container_name: web
+    container_name: example_container_name
     restart: always
     ports:
       - '9990:80'

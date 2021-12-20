@@ -1,21 +1,32 @@
 #!/usr/bin/env node
 
-const child_process = require('child_process')
-const fs = require('fs')
-const path = require('path')
+const child_process = require('child_process');
+const fs = require('fs');
+const path = require('path');
 
-console.log('node_remote_deploy, i am running')
+console.log('node_remote_deploy, i am running');
 
-const VERSION_NAME = 'version_history.txt'
-const versionFilepath = path.join(__dirname, VERSION_NAME)
-const dockerComposeFilepath = path.join(__dirname, '..', 'docker-compose-dev.yml')
-const dockerPull = `docker-compose  -f  docker-compose-dev.yml pull`
-const dockerDown = `docker-compose -f docker-compose-dev.yml down`
-const dockerUp = `docker-compose -f docker-compose-dev.yml up -d`
+const VERSION_NAME = 'version_history.txt';
+const versionFilepath = path.join(__dirname, 'version', VERSION_NAME);
+const dockerComposeFilepath = path.join(
+  __dirname,
+  'docker',
+  'docker-compose.yml',
+)
+const dockerComposeExamplelFilepath = path.join(
+  __dirname,
+  'docker',
+  'docker-compose-example.yml',
+)
 
-console.log('[]:', versionFilepath)
-console.log('[]:', dockerComposeFilepath)
-process.exit(0)
+const imageName = 'ginlink\\/test-rollback';
+
+const dockerPull = `docker-compose  -f  ${dockerComposeFilepath} pull`;
+const dockerDown = `docker-compose -f ${dockerComposeFilepath} down`;
+const dockerUp = `docker-compose -f ${dockerComposeFilepath} up -d`;
+
+console.log('[]:', versionFilepath);
+console.log('[]:', dockerComposeFilepath);
 
 // TODO用流进行操作
 
@@ -23,155 +34,164 @@ function exec(command) {
   return new Promise((resolve, reject) => {
     const child = child_process.exec(command, (error, stdout, stderr) => {
       if (error) {
-        reject({ error, child })
+        reject({ error, child });
       }
 
       resolve({
-        stdout, stderr, child
-      })
-
-    })
-  })
+        stdout,
+        stderr,
+        child,
+      });
+    });
+  });
 }
 
 function validVersion(version) {
-  const reg = /(\d{1,3}\.){2}\d{1,3}/
+  const reg = /(\d{1,3}\.){2}\d{1,3}/;
 
   if (!reg.test(version)) {
-    throw new Error(`except version, like 1.0.0, but got ${version}`)
+    throw new Error(`except version, like 1.0.0, but got ${version}`);
   }
 
-  return version
+  return version;
 }
 
 function removeLastLineData(filepath) {
   return new Promise((resolve, reject) => {
     let failedResult = {
       success: false,
-      data: undefined
-    }
+      data: undefined,
+    };
 
     try {
-
-      const data = fs.readFileSync(filepath, { encoding: 'utf-8' })
+      const data = fs.readFileSync(filepath, { encoding: 'utf-8' });
 
       if (!data || data === '\n') {
         if (data === '\n') {
-          fs.writeFileSync(filepath, '')
+          fs.writeFileSync(filepath, '');
         }
 
         resolve({
           success: true,
-          data: undefined
-        })
+          data: undefined,
+        });
       }
 
-      const arrLines = data.split('\n')
+      const arrLines = data.split('\n');
 
-      let current = undefined
+      let current = undefined;
 
       // handle last ''
-      while (arrLines[arrLines.length - 1] === '') arrLines.pop()
+      while (arrLines[arrLines.length - 1] === '') arrLines.pop();
 
-      let hasValueCurrent = undefined
+      let hasValueCurrent = undefined;
       while (true) {
-        current = arrLines.pop()
+        current = arrLines.pop();
 
         // for unique compare
         if (current) {
-          hasValueCurrent = current
+          hasValueCurrent = current;
         }
 
         // skip ''
         if (arrLines[arrLines.length - 1] === '') {
-          continue
+          continue;
         }
 
         // no left element
         if (current === undefined) {
           resolve({
             success: true,
-            data: undefined
-          })
-          break
+            data: undefined,
+          });
+          break;
         }
 
         // unique
         if (hasValueCurrent !== arrLines[arrLines.length - 1]) {
-          break
+          break;
         }
       }
 
-      const newData = arrLines.length ? arrLines.join('\n') : ''
+      const newData = arrLines.length ? arrLines.join('\n') : '';
 
-      fs.writeFileSync(filepath, newData)
+      fs.writeFileSync(filepath, newData);
 
-      const lastVersion = arrLines[arrLines.length - 1]
+      const lastVersion = arrLines[arrLines.length - 1];
 
       // full success
       resolve({
         success: true,
         data: lastVersion ? validVersion(lastVersion) : undefined,
-      })
+      });
     } catch (err) {
-      console.log('[](err):', err)
-      reject(failedResult)
+      console.log('[](err):', err);
+      reject(failedResult);
     }
-  })
-
+  });
 }
 
 function getLatestVersion() {
   return new Promise((resolve, reject) => {
-
     try {
-      const data = fs.readFileSync(versionFilepath, { encoding: 'utf-8' })
+      const data = fs.readFileSync(versionFilepath, { encoding: 'utf-8' });
 
       if (!data) {
-        resolve(undefined)
+        resolve(undefined);
       }
 
-      const arrLines = data.split('\n')
+      const arrLines = data.split('\n');
+      const version = arrLines[arrLines.length - 1]
+      console.log('[](read-version):', version, arrLines)
 
-      resolve(arrLines[arrLines.length - 1])
+      resolve(version ? version : undefined);
     } catch (err) {
-      reject(err)
+      reject(err);
     }
-  })
-
+  });
 }
 
-async function actionHandleComposeFile(tag) {
+async function actionHandleComposeFile(tag, imageName) {
   if (!tag) {
-    throw new Error('[actionHandleComposeFile](err):', 'no tag')
+    throw new Error('[actionHandleComposeFile](err):', 'no tag');
   }
 
-  const targetImageName = `ginlink/test-rollback:${tag}`
+  // const targetImageName = `ginlink/test-rollback:${tag}`;
+  const targetImageName = `${imageName}:${tag}`;
+  const containerName = imageName.split('/')[1]
 
-  await exec(`sed -i "s/example\\/example-image:tag/${targetImageName}/g" ${dockerComposeFilepath}`)
+  console.log('[](imageName):', targetImageName)
+
+  try {
+    await exec(`cp ${dockerComposeExamplelFilepath} ${dockerComposeFilepath}`)
+    await exec(`docker rm -f ${containerName}`)
+  } catch (err) { }
+
+  await exec(
+    `sed -i "s/example\\/example-image:tag/${targetImageName}/g" ${dockerComposeFilepath}`,
+  );
+  await exec(
+    `sed -i "s/example_container_name/${containerName}/g" ${dockerComposeFilepath}`,
+  );
 }
 
 async function actionDockerCompose() {
-  await exec(dockerPull)
-  await exec(dockerDown)
-  await exec(dockerUp)
+  await exec(dockerPull);
+  await exec(dockerDown);
+  await exec(dockerUp);
 }
 
 async function main() {
-  // const { success, data: tag } = await removeLastLineData(versionFilepath)
-
-  // if (!success || !tag) {
-  //   throw new Error('[removeLastLineData](err):', 'version数据异常')
-  // }
-
   try {
-    const tag = await getLatestVersion()
+    const tag = await getLatestVersion();
+    console.log('[](latest-tag):', tag)
 
-    await actionHandleComposeFile(tag)
-    await actionDockerCompose()
+    await actionHandleComposeFile(tag, imageName);
+
+    await actionDockerCompose();
   } catch (err) {
-    console.log('[node_remote_deploy](err):', err)
+    console.log('[node_remote_deploy](err):', err);
   }
 }
 
-main()
+main();

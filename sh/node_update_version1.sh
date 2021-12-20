@@ -11,6 +11,7 @@ ssh-add deploy.key
 echo "Host *\n\tStrictHostKeyChecking no\n\n" >> ~/.ssh/config
 
 echo "add private key success"
+echo "11111111111111111111111"
 
 # ssh $REMOTE_NAME@$REMOTE_HOST
 

@@ -22,7 +22,7 @@ scp $REMOTE_NAME@$REMOTE_HOST:$remotepath $localpath
 
 # sed -i '$a\"$RELEASE_VERSION"' ./sh/version/version_history.txt
 
-echo $RELEASE_VERSION >> $localpath
+# echo $RELEASE_VERSION >> $localpath
 
-scp $localpath $REMOTE_NAME@$REMOTE_HOST:$remotepath
+# scp $localpath $REMOTE_NAME@$REMOTE_HOST:$remotepath
 

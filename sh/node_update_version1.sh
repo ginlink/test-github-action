@@ -14,11 +14,11 @@ echo "add private key success"
 
 # ssh $REMOTE_NAME@$REMOTE_HOST
 
-mkdir -p ~/sh/version
+mkdir -p ./sh/version
 localpath=~/sh/version/version_history.txt
 remotepath=~/sh/version/version_history.txt
 
-scp $REMOTE_NAME@$REMOTE_HOST:$remotepath $localpath
+scp $REMOTE_NAME@$REMOTE_HOST:$remotepath ./sh/version/version_history.txt
 
 # sed -i '$a\"$RELEASE_VERSION"' ./sh/version/version_history.txt
 

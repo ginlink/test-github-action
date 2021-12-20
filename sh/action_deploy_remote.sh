@@ -18,7 +18,6 @@ const dockerComposeExamplelFilepath = path.join(
 )
 
 const imageName = 'ginlink\\/test-rollback';
-
 const dockerPull = `docker-compose  -f  ${dockerComposeFilepath} pull`;
 const dockerDown = `docker-compose -f ${dockerComposeFilepath} down`;
 const dockerUp = `docker-compose -f ${dockerComposeFilepath} up -d`;

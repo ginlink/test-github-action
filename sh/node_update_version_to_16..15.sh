@@ -9,8 +9,8 @@ console.log('hello, i am running!')
 console.log(`the tag version is ${process.env.RELEASE_VERSION}`)
 
 const currentTag = env.RELEASE_VERSION
-const REMOTE_HOST = env.ADMIN_HOST_15
-const REMOTE_NAME = env.HOST_NAME_15
+const REMOTE_HOST = env.REMOTE_HOST
+const REMOTE_NAME = env.REMOTE_NAME
 const VERSION_NAME = 'version_history.txt'
 const loginFilepath = path.join(__dirname, 'login_ssh.sh')
 const versionFilepath = path.join(__dirname, 'version', VERSION_NAME)

@@ -9,8 +9,8 @@ env:
   DOCKER_ACCESS_TOKEN: ${{ secrets.DOCKER_ACCESS_TOKEN }}
   DOCKER_ACCESS_NAME: ${{ secrets.DOCKER_ACCESS_NAME }}
   PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
-  HOST_NAME_15: ${{ secrets.HOST_NAME_15 }}
-  ADMIN_HOST_15: ${{ secrets.ADMIN_HOST_15 }}
+  REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
+  REMOTE_NAME: ${{ secrets.REMOTE_NAME }}
 
 jobs:
   build:

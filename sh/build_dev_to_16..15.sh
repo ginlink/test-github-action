@@ -1,6 +1,5 @@
 #!/bin/sh
 yarn
-
 yarn build
 
 echo "======================"

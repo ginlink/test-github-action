@@ -8,8 +8,7 @@ console.log('hello, i am running!')
 // console.log(`the env is ${process.env}`)
 console.log(`the tag version is ${process.env.RELEASE_VERSION}`)
 
-// const currentTag = env.RELEASE_VERSION
-const currentTag = '1.0.17'
+const currentTag = env.RELEASE_VERSION
 const REMOTE_HOST = env.ADMIN_HOST_15
 const REMOTE_NAME = env.HOST_NAME_15
 const VERSION_NAME = 'version_history.txt'
@@ -79,6 +78,19 @@ function addLastLine(version, filepath) {
 
 }
 
+async function actionMkdir(dirPath, dirs) {
+  if (!dirPath || !dirs) {
+    throw new Error('expect dirPath and dirs, but got undefined')
+  }
+
+  const combinedDirs = dirs.map((item) => path.join(dirPath, item)).join(' ')
+
+  try {
+    await exec(`mkdir ${combinedDirs}`)
+  } catch (err) {
+  }
+}
+
 async function actionLoginSSH() {
   const { stdout } = await execFile(loginFilepath)
 
@@ -87,8 +99,7 @@ async function actionLoginSSH() {
 
 async function actionScpRemoteFile() {
   try {
-    const { stdout } = await exec(`scp ${REMOTE_NAME}@${REMOTE_HOST}:${versionFilepathRemote} ${versionFilepath}`)
-    console.log('[actionScpRemoteFile](stdout):', stdout)
+    await exec(`scp ${REMOTE_NAME}@${REMOTE_HOST}:${versionFilepathRemote} ${versionFilepath}`)
   } catch (err) {
     console.log('[actionScpRemoteFile](err):', err.error)
   }
@@ -112,6 +123,8 @@ async function main() {
   if (!currentTag) return console.log('[main](no tag):',)
 
   try {
+    await actionMkdir(__dirname, ['version', 'docker'])
+
     await actionLoginSSH()
     await actionScpRemoteFile()
     await actionUpdateVersion(currentTag)

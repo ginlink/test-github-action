@@ -14,4 +14,6 @@ echo "[success] add private key"
 
 scp ./sh/node_remote_deploy.sh  $REMOTE_NAME@$REMOTE_HOST:~/sh/node_remote_deploy.sh
 
-ssh -tt $REMOTE_NAME@$REMOTE_HOST "cd ~ && ./sh/node_remote_deploy.sh"
+# ssh -tt $REMOTE_NAME@$REMOTE_HOST "cd ~ && ./sh/node_remote_deploy.sh"
+
+ssh -tt $REMOTE_NAME@$REMOTE_HOST "whoami"

@@ -12,9 +12,6 @@ echo "Host *\n\tStrictHostKeyChecking no\n\n" >> ~/.ssh/config
 
 echo "[success] add private key"
 
-scp $REMOTE_NAME@$REMOTE_HOST:~/sh/version/version_history.txt ./version_history.txt
+scp ./sh/node_remote_deploy.sh  $REMOTE_NAME@$REMOTE_HOST:~/sh/node_remote_deploy.sh
 
-# echo $RELEASE_VERSION >> ./version_history.txt
-echo '1.0.21' >> ./version_history.txt
-
-scp ./version_history.txt $REMOTE_NAME@$REMOTE_HOST:~/sh/version/version_history.txt
+ssh $REMOTE_NAME@$REMOTE_HOST "cd ~ && ./sh/node_remote_deploy.sh"

@@ -17,6 +17,4 @@ jobs:
           echo $RELEASE_VERSION
           echo ${{ env.RELEASE_VERSION }}
       - name: Test in other shell
-        run: |
-          ./sh/test-any.sh
-          ./sh/test-any2.sh
+        run: ./sh/deploy.sh

@@ -40,7 +40,9 @@ jobs:
             node_modules
             */*/node_modules
           key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
-      - name: build dev
+      - name: build
         run: ./sh/build_dev_to_16..15.sh
       - name: update version
         run: ./sh/update_version.sh
+      - name: deploy
+        run: ./sh/deploy.sh

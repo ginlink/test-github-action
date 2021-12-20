@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/root/.nvm/versions/node/v14.18.2/bin/node
 
 const child_process = require('child_process');
 const fs = require('fs');
@@ -7,15 +7,21 @@ const path = require('path');
 console.log('node_remote_deploy, i am running');
 
 const VERSION_NAME = 'version_history.txt';
-const versionFilepath = path.join(__dirname, 'version', VERSION_NAME);
+const versionFilepath = path.join(__dirname, VERSION_NAME);
 const dockerComposeFilepath = path.join(
   __dirname,
-  '..',
-  'docker-compose-dev.yml',
-);
-const dockerPull = `docker-compose  -f  docker-compose-dev.yml pull`;
-const dockerDown = `docker-compose -f docker-compose-dev.yml down`;
-const dockerUp = `docker-compose -f docker-compose-dev.yml up -d`;
+  'docker-compose.yml',
+)
+const dockerComposeExamplelFilepath = path.join(
+  __dirname,
+  'docker-compose-example.yml',
+)
+
+const imageName = 'ginlink\\/test-rollback';
+
+const dockerPull = `docker-compose  -f  ${dockerComposeFilepath} pull`;
+const dockerDown = `docker-compose -f ${dockerComposeFilepath} down`;
+const dockerUp = `docker-compose -f ${dockerComposeFilepath} up -d`;
 
 console.log('[]:', versionFilepath);
 console.log('[]:', dockerComposeFilepath);
@@ -105,12 +111,11 @@ function removeLastLineData(filepath) {
         }
       }
 
-      let newData = arrLines.length ? arrLines.join('\n') : '';
-      newData += '\n' //last line append a \n
+      const newData = arrLines.length ? arrLines.join('\n') : '';
 
       fs.writeFileSync(filepath, newData);
 
-      const lastVersion = arrLines[arrLines.length - 2];
+      const lastVersion = arrLines[arrLines.length - 1];
 
       // full success
       resolve({
@@ -134,65 +139,57 @@ function getLatestVersion() {
       }
 
       const arrLines = data.split('\n');
+      const version = arrLines[arrLines.length - 2]
+      console.log('[](read-version):', version, arrLines)
 
-      resolve(arrLines[arrLines.length - 2]);
+      resolve(version ? version : undefined);
     } catch (err) {
       reject(err);
     }
   });
 }
 
-async function actionStopCurrent(tag) {
+async function actionHandleComposeFile(tag, imageName) {
   if (!tag) {
     throw new Error('[actionHandleComposeFile](err):', 'no tag');
   }
 
-  const targetImageName = `ginlink/test-rollback:${tag}`;
+  // const targetImageName = `ginlink/test-rollback:${tag}`;
+  const targetImageName = `${imageName}:${tag}`;
+  const containerName = imageName.split('/')[1]
+
+  console.log('[](imageName):', targetImageName)
+
+  try {
+    await exec(`cp ${dockerComposeExamplelFilepath} ${dockerComposeFilepath}`)
+    await exec(`docker rm -f ${containerName}`)
+  } catch (err) { }
 
   await exec(
     `sed -i "s/example\\/example-image:tag/${targetImageName}/g" ${dockerComposeFilepath}`,
   );
-  await exec(dockerDown);
-}
-
-async function actionHandleComposeFile(tag) {
-  if (!tag) {
-    throw new Error('[actionHandleComposeFile](err):', 'no tag');
-  }
-
-  const targetImageName = `ginlink/test-rollback:${tag}`;
-
   await exec(
-    `sed -i "s/example\\/example-image:tag/${targetImageName}/g" ${dockerComposeFilepath}`,
+    `sed -i "s/example_container_name/${containerName}/g" ${dockerComposeFilepath}`,
   );
 }
 
-async function actionDockerCompose(tag) {
-  await actionHandleComposeFile(tag);
-
+async function actionDockerCompose() {
   await exec(dockerPull);
   await exec(dockerDown);
   await exec(dockerUp);
 }
 
 async function main() {
-  const latestTag = await getLatestVersion();
+  try {
+    const tag = await getLatestVersion();
+    console.log('[](latest-tag):', tag)
 
-  if (!validVersion(latestTag)) {
-    throw new Error('[removeLastLineData](err):', 'version数据异常');
+    await actionHandleComposeFile(tag, imageName);
+
+    await actionDockerCompose();
+  } catch (err) {
+    console.log('[node_remote_deploy](err):', err);
   }
-
-  const { success, data: tag } = await removeLastLineData(versionFilepath);
-
-  if (!success || !tag) {
-    throw new Error('[removeLastLineData](err):', 'version数据异常');
-  }
-
-
-  console.log('[]:', success, latestTag, tag)
-  process.exit(0)
-  await actionStopCurrent(latestTag);
-  await actionDockerCompose(tag);
 }
 
 main();

@@ -12,6 +12,7 @@ echo "Host *\n\tStrictHostKeyChecking no\n\n" >> ~/.ssh/config
 
 echo "[success] add private key"
 
-scp ./sh/node_remote_deploy.sh  $REMOTE_NAME@$REMOTE_HOST:~/sh/node_remote_deploy.sh
+scp ./sh/action_deploy_remote.sh  $REMOTE_NAME@$REMOTE_HOST:~/sh/action_deploy_remote.sh
+scp ./docker-compose-example.yml  $REMOTE_NAME@$REMOTE_HOST:~/sh/docker-compose-example.yml
 
-ssh -tt $REMOTE_NAME@$REMOTE_HOST "cd ~ && ./sh/node_remote_deploy.sh"
+ssh -tt $REMOTE_NAME@$REMOTE_HOST "cd ~ && ./sh/action_deploy_remote.sh"

@@ -14,7 +14,8 @@ echo "add private key success"
 
 # ssh $REMOTE_NAME@$REMOTE_HOST
 
-localpath=./sh/version/version_history.txt
+mkdir -p ~/sh/version
+localpath=~/sh/version/version_history.txt
 remotepath=~/sh/version/version_history.txt
 
 scp $REMOTE_NAME@$REMOTE_HOST:$remotepath $localpath

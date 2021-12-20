@@ -126,6 +126,8 @@ async function main() {
     await actionMkdir(__dirname, ['version', 'docker'])
 
     await actionLoginSSH()
+
+    process.exit(0)
     await actionScpRemoteFile()
     await actionUpdateVersion(currentTag)
     await actionScp2Remote()

@@ -42,3 +42,5 @@ jobs:
           key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
       - name: build dev
         run: ./sh/build_dev_to_16..15.sh
+      - name: update version
+        run: ./sh/update_version_to_16..15.sh

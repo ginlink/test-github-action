@@ -40,7 +40,5 @@ jobs:
             node_modules
             */*/node_modules
           key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
-      - name: rollback prepare
-        run: ./sh/action_rollback_prepare.sh
       - name: rollback
-        run: ./sh/action_rollback_remote.sh
+        run: ./sh/04action_rollback_local.sh

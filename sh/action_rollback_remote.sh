@@ -8,7 +8,7 @@ console.log('node_remote_deploy, i am running');
 
 const VERSION_NAME = 'version_history.txt';
 const imageName = 'ginlink\\/test-rollback'
-const versionFilepath = path.join(__dirname, 'version', VERSION_NAME);
+const versionFilepath = path.join(__dirname, VERSION_NAME);
 
 const containerName = imageName.split('/')[1]
 const dockerComposeFilepath = path.join(
@@ -183,22 +183,27 @@ async function actionDockerCompose(preTag, latestTag) {
 }
 
 async function main() {
-  const latestTag = await getLatestVersion();
+  try {
+    const latestTag = await getLatestVersion();
 
-  if (!validVersion(latestTag)) {
-    throw new Error('[removeLastLineData](err):', 'version数据异常');
+    if (!validVersion(latestTag)) {
+      throw new Error('[removeLastLineData](err):', 'version数据异常');
+    }
+
+    const { success, data: preTag } = await removeLastLineData(versionFilepath);
+
+    if (!success || !preTag) {
+      throw new Error('[removeLastLineData](err):', 'version数据异常');
+    }
+
+
+    console.log('[]:', success, latestTag, preTag)
+    // process.exit(0)
+    await actionDockerCompose(preTag, latestTag);
+
+  } catch (err) {
+    process.exit(1)
   }
-
-  const { success, data: preTag } = await removeLastLineData(versionFilepath);
-
-  if (!success || !preTag) {
-    throw new Error('[removeLastLineData](err):', 'version数据异常');
-  }
-
-
-  console.log('[]:', success, latestTag, preTag)
-  // process.exit(0)
-  await actionDockerCompose(preTag, latestTag);
 }
 
 main();
